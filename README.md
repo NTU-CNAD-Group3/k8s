@@ -11,9 +11,9 @@ This repository contains three environments for deploying the services: dev, sta
 
 1. Install Docker Desktop and enable Kubernetes.
 
-- Windows : win11
-- docker : Docker Desktop 4.39.0 (184744)
-- kubectl : v1.32.2
+    - Windows : win11
+    - docker : Docker Desktop 4.39.0 (184744)
+    - kubectl : v1.32.2
 
 2. Setup Secrets
 
