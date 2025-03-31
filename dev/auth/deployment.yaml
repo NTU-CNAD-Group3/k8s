@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth
+  namespace: auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 50%
+      maxSurge: 50%
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - name: auth
+          image: cnad-auth:latest
+          imagePullPolicy: Never
+          resources:
+            limits:
+              cpu: 200m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 150Mi
+          ports:
+            - name: auth-port
+              containerPort: 8000
+          livenessProbe:
+            httpGet:
+              path: /api/healthy
+              port: 8000
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 60
+            failureThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /api/healthy
+              port: 8000
+            initialDelaySeconds: 20
+            timeoutSeconds: 2
+            periodSeconds: 20
+            failureThreshold: 1
+          env:
+            - name: PORT
+              value: "8000"
+            - name: API_VERSION
+              value: "v1"
+            - name: JWT_TOKEN
+              value: "123"
+            - name: CLIENT_URL
+              value: "http://localhost:3000"
+            - name: API_GATEWAY_URL
+              value: "gateway.gateway.svc.cluster.local:8000"
+            - name: RABBITMQ_ENDPOINT
+              value: amqp://admin:admin@rabbitmq.queue.svc.cluster.local:5672
+            - name: DATABASE_HOST
+              value: postgres-auth-0.postgres-auth.postgres-auth.svc.cluster.local
+            - name: DATABASE_USER
+              value: admin
+            - name: DATABASE_PASSWORD
+              value: admin
+            - name: DATABASE_NAME
+              value: auth
+            - name: DATABASE_PORT
+              value: "5432"

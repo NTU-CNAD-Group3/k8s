@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification
+  namespace: notification
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 50%
+      maxSurge: 50%
+  template:
+    metadata:
+      labels:
+        app: notification
+    spec:
+      containers:
+        - name: notification
+          image: cnad-notification:latest
+          imagePullPolicy: Never
+          resources:
+            limits:
+              cpu: 200m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 300Mi
+          ports:
+            - name: noti-port
+              containerPort: 8000
+          livenessProbe:
+            httpGet:
+              path: /api/healthy
+              port: 8000
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 60
+            failureThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /api/healthy
+              port: 8000
+            initialDelaySeconds: 20
+            timeoutSeconds: 2
+            periodSeconds: 20
+            failureThreshold: 1
+          env:
+            - name: PORT
+              value: "8000"
+            - name: CLIENT_URL
+              value: "http://localhost:3000"
+            - name: RABBITMQ_ENDPOINT
+              value: amqp://admin:admin@rabbitmq.queue.svc.cluster.local:5672
+            - name: SENDER_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: secret
+                  key: sender-email
+            - name: SENDER_EMAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secret
+                  key: sender-email-password

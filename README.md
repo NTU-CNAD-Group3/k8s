@@ -2,41 +2,50 @@
 
 This repository contains three environments for deploying the services: dev, staging, and production (on GKE). Each environment has its own configuration files and setup instructions.
 
-## Dev
+## Environments setup
 
-To setup the local environment, please make sure you have kubernetes installed. You can install kubernetes by docker desktop or minikube.
+### Dev
 
-```bash
-kubectl version
-```
+> [!NOTE]
+> Dev environment is a local environment for development and testing our microservices. It is a lightweight environment and doesn't provide any additional features like HA or scaling.
 
-To apply the yaml files, run the following command:
+1. Install Docker Desktop and enable Kubernetes.
 
-```bash
-./run.sh --dev
-```
+- Windows : win11
+- docker : Docker Desktop 4.39.0 (184744)
+- kubectl : v1.32.2
 
-Dev environment is a local environment for development and testing our microservices. It is a lightweight environment that uses local resources and does not require many resources.
+2. Setup Secrets
 
-## Staging
-
-To setup the local environment, please make sure you have kubernetes installed. You can install kubernetes by docker desktop or minikube.
+Before starting the dev environment, please make sure you have setup the correct secrets for the services. We provide a template for the secrets in the `/secret/secrets-template.yaml` file. FYI, the secrets should be encoded in base64 format. You can use the following command to encode the secrets: (Windows users can use `git bash` or `wsl` to run this command)
 
 ```bash
-kubectl version
+echo -n 'your-secret' | base64
 ```
 
-To apply the yaml files, run the following command:
+Copy the encoded secret to the `secrets-template.yaml` file and rename it to `secrets.yaml` in the `dev/secret` folder. The secrets will be mounted to the services as environment variables.
+
+3. Setup the k8s cluster
+
+To setup the k8s cluster, please run the following command:
 
 ```bash
-./run.sh --stage
+run.sh --dev
 ```
 
-The difference between dev and stage is that the stage environment will be more similar to the production environment. The stage environment will use some HA techniques, such as using sentinel for redis, pgpool for postgres, and service mesh, which will need many memory and CPU resources. So please make sure you have enough resources in your local machine.
+This will create the k8s cluster and deploy the services to the cluster. The services will be accessible at `http://kubernetes.docker.internal`
 
-## Google Cloud
+### Staging
 
-To setup the google cloud environment, please make sure you have setup the kubernetes context to the google cloud.
+> [!WARNING]
+> Staging environment haven't completely setup yet. Please use the dev environment for development and testing.
+
+### Google Cloud
+
+> [!WARNING]
+> GCP environment haven't completely setup yet. Please use the dev environment for development and testing.
+
+<!-- To setup the google cloud environment, please make sure you have setup the kubernetes context to the google cloud.
 
 ```bash
 kubectl config get-contexts
@@ -47,4 +56,4 @@ To apply the yaml files, run the following command:
 
 ```bash
 ./run.sh --prod
-```
+``` -->

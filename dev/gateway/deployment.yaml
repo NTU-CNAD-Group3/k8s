@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+  namespace: gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 50%
+      maxSurge: 50%
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      containers:
+        - name: gateway
+          image: cnad-gateway:latest
+          imagePullPolicy: Never
+          resources:
+            limits:
+              cpu: 200m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 150Mi
+          ports:
+            - name: gateway-port
+              containerPort: 8000
+          livenessProbe:
+            httpGet:
+              path: /api/healthy
+              port: 8000
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 60
+            failureThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /api/healthy
+              port: 8000
+            initialDelaySeconds: 20
+            timeoutSeconds: 2
+            periodSeconds: 20
+            failureThreshold: 1
+          env:
+            - name: PORT
+              value: "8000"
+            - name: API_VERSION
+              value: "v1"
+            - name: SECRET_KEY
+              value: "123456789"
+            - name: CLIENT_URL
+              value: "http://localhost:3000"
+            - name: AUTH_BASE_URL
+              value: "http://auth.auth.svc.cluster.local:8000"
+            - name: REDIS_HOST
+              value: "redis-0.redis.redis.svc.cluster.local"
+            - name: REDIS_PASSWORD
+              value: "redispassword"
+            - name: REDIS_PORT
+              value: "6379"

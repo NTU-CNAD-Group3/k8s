@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  namespace: queue
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: queue
+  template:
+    metadata:
+      labels:
+        app: queue
+    spec:
+      containers:
+        - name: queue
+          image: rabbitmq:3.13.4-management-alpine
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: rabbitmq-config
+          resources:
+            limits:
+              cpu: 500m
+              memory: "1Gi"
+            requests:
+              cpu: 100m
+              memory: 150Mi
+          ports:
+            - name: queue-port
+              containerPort: 5672
+              protocol: TCP
+            - name: mgmt-port
+              containerPort: 15672
+              protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - rabbitmq-diagnostics -q status
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 1
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - rabbitmq-diagnostics -q status
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 1
+          volumeMounts:
+            - name: rabbitmq-local-storage
+              mountPath: /var/lib/rabbitmq
+      volumes:
+        - name: rabbitmq-local-storage
+          persistentVolumeClaim:
+            claimName: rabbitmq-pvc
