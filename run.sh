@@ -50,6 +50,12 @@ fi
 apply_kubectl "$CONFIG_DIR/redis"
 apply_kubectl "$CONFIG_DIR/postgres-auth"
 apply_kubectl "$CONFIG_DIR/rabbitmq"
+
+tput setaf 3; echo "Waiting for all pods to be in running state."; tput sgr0
+kubectl wait --for=condition=Ready pod -l app=redis --timeout=60s --namespace=redis
+kubectl wait --for=condition=Ready pod -l app=queue --timeout=60s --namespace=queue
+kubectl wait --for=condition=Ready pod -l app=postgres-auth --timeout=60s --namespace=postgres-auth
+
 apply_kubectl "$CONFIG_DIR/gateway"
 apply_kubectl "$CONFIG_DIR/notification"
 apply_kubectl "$CONFIG_DIR/auth"
@@ -62,20 +68,9 @@ if [ "$ENV" == "dev" ]; then
   fi
 fi
 
-tput setaf 3; echo "Waiting for all pods to be in running state."; tput sgr0
-kubectl wait --for=condition=Ready pod -l app=redis --timeout=60s --namespace=redis
-kubectl wait --for=condition=Ready pod -l app=queue --timeout=60s --namespace=queue
-kubectl wait --for=condition=Ready pod -l app=postgres-auth --timeout=60s --namespace=postgres-auth
-
-echo
-tput setaf 3; echo "Deleting all pods in all namespaces."; tput sgr0
-tput setaf 2; echo "Pods will be recreated automatically."; tput sgr0
-kubectl delete --all pods --namespace=gateway
-kubectl delete --all pods --namespace=notification
-kubectl delete --all pods --namespace=auth
-
 echo 
 tput setaf 2; echo "Successfully applied kubernetes resources for $ENV environment."; tput sgr0
+tput setaf 2; echo "Please wait for all pods to be in running state."; tput sgr0
 
 echo
 tput setaf 3; echo "Cleaning up old images."; tput sgr0
