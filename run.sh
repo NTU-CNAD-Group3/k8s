@@ -19,12 +19,14 @@ if [ "$ENV" == "dev" ]; then
   docker build -t cnad-gateway:latest -f ../gateway/Dockerfile.dev ../gateway
   docker build -t cnad-notification:latest -f ../notification/Dockerfile.dev ../notification
   docker build -t cnad-auth:latest -f ../auth/Dockerfile.dev ../auth
+  docker build -t cnad-backend:latest -f ../backend/Dockerfile.dev ../backend
 elif [ "$ENV" == "stage" ]; then
   CONFIG_DIR=stage
   
-  docker build -t cnad-gateway:latest -f ../gateway/Dockerfile.prd ../gateway
-  docker build -t cnad-notification:latest -f ../notification/Dockerfile.prd ../notification
-  docker build -t cnad-auth:latest -f ../auth/Dockerfile.prd ../auth
+  docker build -t cnad-gateway:latest -f ../gateway/Dockerfile ../gateway
+  docker build -t cnad-notification:latest -f ../notification/Dockerfile ../notification
+  docker build -t cnad-auth:latest -f ../auth/Dockerfile ../auth
+  docker build -t cnad-backend:latest -f ../backend/Dockerfile ../backend
 elif [ "$ENV" == "prod" ]; then
   CONFIG_DIR=prod
 fi
@@ -59,6 +61,7 @@ kubectl wait --for=condition=Ready pod -l app=postgres-auth --timeout=60s --name
 apply_kubectl "$CONFIG_DIR/gateway"
 apply_kubectl "$CONFIG_DIR/notification"
 apply_kubectl "$CONFIG_DIR/auth"
+apply_kubectl "$CONFIG_DIR/backend"
 
 if [ "$ENV" == "dev" ]; then
   tput setaf 3; echo "Applying ingress-nginx controller."; tput sgr0
