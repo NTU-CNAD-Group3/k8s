@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-backend
+  namespace: postgres-backend
+spec:
+  serviceName: postgres-backend
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-backend
+  template:
+    metadata:
+      labels:
+        app: postgres-backend
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: postgres-backend
+          image: postgres:16.8
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: postgres-backend-config
+          resources:
+            limits:
+              cpu: 500m
+              memory: '1Gi'
+            requests:
+              cpu: 100m
+              memory: 150Mi
+          ports:
+            - name: pg-be-port
+              containerPort: 5432
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - pg_isready -U admin -d backend
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 2
+            failureThreshold: 1
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - pg_isready -U admin -d backend
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 2
+            failureThreshold: 1
+          volumeMounts:
+            - name: postgres-backend-local-storage
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-backend-local-storage
+      spec:
+        accessModes: ['ReadWriteOnce']
+        storageClassName: 'postgres-backend-local-storage'
+        resources:
+          requests:
+            storage: 1Gi

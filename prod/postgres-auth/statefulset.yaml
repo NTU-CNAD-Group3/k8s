@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-auth
+  namespace: postgres-auth
+spec:
+  serviceName: postgres-auth
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-auth
+  template:
+    metadata:
+      labels:
+        app: postgres-auth
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: postgres-auth
+          image: postgres:16.8
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: postgres-auth-config
+          resources:
+            limits:
+              cpu: 500m
+              memory: "1Gi"
+            requests:
+              cpu: 100m
+              memory: 150Mi
+          ports:
+            - name: pg-auth-port
+              containerPort: 5432
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - pg_isready -U admin -d auth
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 2
+            failureThreshold: 1
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - pg_isready -U admin -d auth
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 2
+            failureThreshold: 1
+          volumeMounts:
+            - name: postgres-auth-local-storage
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-auth-local-storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: "postgres-auth-local-storage"
+        resources:
+          requests:
+            storage: 1Gi

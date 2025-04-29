@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 50%
+      maxSurge: 50%
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: cnad-backend:latest
+          imagePullPolicy: Never
+          resources:
+            limits:
+              cpu: 200m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 150Mi
+          ports:
+            - name: backend-port
+              containerPort: 8000
+          livenessProbe:
+            httpGet:
+              path: /api/healthy
+              port: 8000
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 60
+            failureThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /api/healthy
+              port: 8000
+            initialDelaySeconds: 20
+            timeoutSeconds: 2
+            periodSeconds: 20
+            failureThreshold: 1
+          env:
+            - name: PORT
+              value: '8000'
+            - name: API_GATEWAY_URL
+              value: 'gateway.gateway.svc.cluster.local:8000'
+            - name: DATABASE_HOST
+              value: postgres-backend-0.postgres-backend.postgres-backend.svc.cluster.local
+            - name: DATABASE_USER
+              value: admin
+            - name: DATABASE_PASSWORD
+              value: admin
+            - name: DATABASE_NAME
+              value: backend
+            - name: DATABASE_PORT
+              value: '5432'
