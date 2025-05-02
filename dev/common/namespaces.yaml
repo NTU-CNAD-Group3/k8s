@@ -16,6 +16,11 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: backend
+---
+apiVersion: v1
+kind: Namespace
+metadata:
   name: postgres-auth
 ---
 apiVersion: v1
