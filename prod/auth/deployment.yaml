@@ -18,16 +18,24 @@ spec:
       labels:
         app: auth
     spec:
+      serviceAccountName: ksa-auth
       containers:
         - name: auth
-          image: cnad-auth:latest
-          imagePullPolicy: Never
+          image: asia-east1-docker.pkg.dev/cnad-group3/cnad-prod-repo/auth:latest
+          imagePullPolicy: Always
+          command: ["/bin/sh"]
+          args:
+            - "-c"
+            - |
+              export SECRET_KEY=$(cat /mnt/secrets-store/secret-key) && \
+              export JWT_TOKEN=$(cat /mnt/secrets-store/jwt-token) && \
+              npm run start --silent
           resources:
             limits:
               cpu: 200m
               memory: 1Gi
             requests:
-              cpu: 100m
+              cpu: 10m
               memory: 150Mi
           ports:
             - name: auth-port
@@ -53,10 +61,8 @@ spec:
               value: "8000"
             - name: API_VERSION
               value: "v1"
-            - name: JWT_TOKEN
-              value: "123"
             - name: CLIENT_URL
-              value: "http://localhost:3000"
+              value: "https://cnad.info"
             - name: API_GATEWAY_URL
               value: "gateway.gateway.svc.cluster.local:8000"
             - name: RABBITMQ_ENDPOINT
@@ -71,3 +77,14 @@ spec:
               value: auth
             - name: DATABASE_PORT
               value: "5432"
+          volumeMounts:
+            - name: secret-volume
+              mountPath: /mnt/secrets-store
+              readOnly: true
+      volumes:
+        - name: secret-volume
+          csi:
+            driver: secrets-store-gke.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: auth-secret

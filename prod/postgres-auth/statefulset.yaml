@@ -17,7 +17,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: postgres-auth
-          image: postgres:16.8
+          image: postgres:16.8-alpine
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
@@ -27,7 +27,7 @@ spec:
               cpu: 500m
               memory: "1Gi"
             requests:
-              cpu: 100m
+              cpu: 10m
               memory: 150Mi
           ports:
             - name: pg-auth-port
@@ -53,14 +53,14 @@ spec:
             timeoutSeconds: 2
             failureThreshold: 1
           volumeMounts:
-            - name: postgres-auth-local-storage
+            - name: postgres-auth-gcp-storage
               mountPath: /var/lib/postgresql/data
   volumeClaimTemplates:
     - metadata:
-        name: postgres-auth-local-storage
+        name: postgres-auth-gcp-storage
       spec:
         accessModes: ["ReadWriteOnce"]
-        storageClassName: "postgres-auth-local-storage"
+        storageClassName: "postgres-auth-gcp-storage"
         resources:
           requests:
             storage: 1Gi

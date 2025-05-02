@@ -20,14 +20,14 @@ spec:
     spec:
       containers:
         - name: backend
-          image: cnad-backend:latest
-          imagePullPolicy: Never
+          image: asia-east1-docker.pkg.dev/cnad-group3/cnad-prod-repo/backend:latest
+          imagePullPolicy: Always
           resources:
             limits:
               cpu: 200m
               memory: 1Gi
             requests:
-              cpu: 100m
+              cpu: 10m
               memory: 150Mi
           ports:
             - name: backend-port

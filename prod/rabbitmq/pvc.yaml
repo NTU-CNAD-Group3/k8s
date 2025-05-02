@@ -4,7 +4,7 @@ metadata:
   name: rabbitmq-pvc
   namespace: queue
 spec:
-  storageClassName: rabbitmq-local-storage
+  storageClassName: rabbitmq-gcp-storage
   resources:
     requests:
       storage: 1Gi

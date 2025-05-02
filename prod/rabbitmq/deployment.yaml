@@ -25,7 +25,7 @@ spec:
               cpu: 500m
               memory: "1Gi"
             requests:
-              cpu: 100m
+              cpu: 10m
               memory: 150Mi
           ports:
             - name: queue-port
@@ -55,9 +55,9 @@ spec:
             timeoutSeconds: 5
             failureThreshold: 1
           volumeMounts:
-            - name: rabbitmq-local-storage
+            - name: rabbitmq-gcp-storage
               mountPath: /var/lib/rabbitmq
       volumes:
-        - name: rabbitmq-local-storage
+        - name: rabbitmq-gcp-storage
           persistentVolumeClaim:
             claimName: rabbitmq-pvc

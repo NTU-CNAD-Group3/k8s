@@ -18,16 +18,24 @@ spec:
       labels:
         app: gateway
     spec:
+      serviceAccountName: ksa-gateway
       containers:
         - name: gateway
-          image: cnad-gateway:latest
-          imagePullPolicy: Never
+          image: asia-east1-docker.pkg.dev/cnad-group3/cnad-prod-repo/gateway:latest
+          imagePullPolicy: Always
+          command: ["/bin/sh"]
+          args:
+            - "-c"
+            - |
+              export SECRET_KEY=$(cat /mnt/secrets-store/secret-key) && \
+              export JWT_TOKEN=$(cat /mnt/secrets-store/jwt-token) && \
+              npm run start --silent
           resources:
             limits:
               cpu: 200m
               memory: 1Gi
             requests:
-              cpu: 100m
+              cpu: 10m
               memory: 150Mi
           ports:
             - name: gateway-port
@@ -53,10 +61,8 @@ spec:
               value: "8000"
             - name: API_VERSION
               value: "v1"
-            - name: SECRET_KEY
-              value: "123456789"
             - name: CLIENT_URL
-              value: "http://localhost:3000"
+              value: "https://cnad.info"
             - name: AUTH_BASE_URL
               value: "http://auth.auth.svc.cluster.local:8000"
             - name: REDIS_HOST
@@ -65,3 +71,14 @@ spec:
               value: "redispassword"
             - name: REDIS_PORT
               value: "6379"
+          volumeMounts:
+            - name: secret-volume
+              mountPath: /mnt/secrets-store
+              readOnly: true
+      volumes:
+        - name: secret-volume
+          csi:
+            driver: secrets-store-gke.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: gateway-secret

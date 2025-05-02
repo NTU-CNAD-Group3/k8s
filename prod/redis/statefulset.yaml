@@ -54,7 +54,7 @@ spec:
               cpu: 500m
               memory: 1Gi
             requests:
-              cpu: 100m
+              cpu: 10m
               memory: 150Mi
           command: ["redis-server"]
           args: ["/etc/redis/redis.conf"]
@@ -97,7 +97,7 @@ spec:
         name: data
       spec:
         accessModes: ["ReadWriteOnce"]
-        storageClassName: "redis-local-storage"
+        storageClassName: "redis-gcp-storage"
         resources:
           requests:
             storage: 500Mi

@@ -18,16 +18,24 @@ spec:
       labels:
         app: notification
     spec:
+      serviceAccountName: ksa-notification
       containers:
         - name: notification
-          image: cnad-notification:latest
-          imagePullPolicy: Never
+          image: asia-east1-docker.pkg.dev/cnad-group3/cnad-prod-repo/notification:latest
+          imagePullPolicy: Always
+          command: ["/bin/sh"]
+          args:
+            - "-c"
+            - |
+              export sender_email=$(cat /mnt/secrets-store/sender-email) && \
+              export sender_email_password=$(cat /mnt/secrets-store/sender-email-password) && \
+              npm run start --silent
           resources:
             limits:
               cpu: 200m
               memory: 1Gi
             requests:
-              cpu: 100m
+              cpu: 10m
               memory: 300Mi
           ports:
             - name: noti-port
@@ -52,16 +60,18 @@ spec:
             - name: PORT
               value: "8000"
             - name: CLIENT_URL
-              value: "http://localhost:3000"
+              value: "https://cnad.info"
             - name: RABBITMQ_ENDPOINT
               value: amqp://admin:admin@rabbitmq.queue.svc.cluster.local:5672
-            - name: SENDER_EMAIL
-              valueFrom:
-                secretKeyRef:
-                  name: secret
-                  key: sender-email
-            - name: SENDER_EMAIL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: secret
-                  key: sender-email-password
+          volumeMounts:
+            - name: secret-volume
+              mountPath: /mnt/secrets-store
+              readOnly: true
+      volumes:
+        - name: secret-volume
+          csi:
+            driver: secrets-store-gke.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: notification-secret
+          
