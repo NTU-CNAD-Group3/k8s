@@ -42,17 +42,16 @@ This will create the k8s cluster and deploy the services to the cluster. The ser
 
 ### Google Cloud
 
-> [!WARNING]
-> GCP environment haven't completely setup yet. Please use the dev environment for development and testing.
+We use github actions to deploy the services to GKE. The deployment process is automated and will be triggered on every push to the `main` branch. The deployment process will build the docker images, push them to the GCP artifact registry, and rollout the changes to the GKE cluster.
 
-1. connect to GCP
+- connect to GCP
 
 ```bash
 gcloud auth login
 gcloud components install gke-gcloud-auth-plugin
 ```
 
-2. add GKE credentials
+- add GKE credentials
 
 ```bash
 gcloud container clusters get-credentials cnad-prod-gke --zone asia-east1-a --project cnad-group3
