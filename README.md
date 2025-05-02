@@ -11,9 +11,9 @@ This repository contains three environments for deploying the services: dev, sta
 
 1. Install Docker Desktop and enable Kubernetes.
 
-    - Windows : win11
-    - docker : Docker Desktop 4.39.0 (184744)
-    - kubectl : v1.32.2
+   - Windows : win11
+   - docker : Docker Desktop 4.39.0 (184744)
+   - kubectl : v1.32.2
 
 2. Setup Secrets
 
@@ -45,15 +45,15 @@ This will create the k8s cluster and deploy the services to the cluster. The ser
 > [!WARNING]
 > GCP environment haven't completely setup yet. Please use the dev environment for development and testing.
 
-<!-- To setup the google cloud environment, please make sure you have setup the kubernetes context to the google cloud.
+1. connect to GCP
 
 ```bash
-kubectl config get-contexts
-kubectl config use-context <context-name>
+gcloud auth login
+gcloud components install gke-gcloud-auth-plugin
 ```
 
-To apply the yaml files, run the following command:
+2. add GKE credentials
 
 ```bash
-./run.sh --prod
-``` -->
+gcloud container clusters get-credentials cnad-prod-gke --zone asia-east1-a --project cnad-group3
+```
