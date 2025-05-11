@@ -37,7 +37,7 @@ This will create the k8s cluster and deploy the services to the cluster. The ser
 
 ### Google Cloud
 
-We use github actions to deploy the services to GKE. The deployment process is automated and will be triggered on every push to the `main` branch. The deployment process will build the docker images, push them to the GCP artifact registry, and rollout the changes to the GKE cluster.
+We use GKE (Google Kubernetes Engine) as our production environment. You should apply all the `.yaml` files in the `prod` folder to the GKE cluster.
 
 - connect to GCP
 
