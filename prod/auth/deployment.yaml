@@ -27,7 +27,6 @@ spec:
           args:
             - "-c"
             - |
-              export SECRET_KEY=$(cat /mnt/secrets-store/secret-key) && \
               export JWT_TOKEN=$(cat /mnt/secrets-store/jwt-token) && \
               npm run start --silent
           resources:

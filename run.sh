@@ -7,8 +7,8 @@ if [ -z "$ENV" ]; then
   ENV=dev
 fi
 
-if [ "$ENV" != "dev" ] && [ "$ENV" != "stage" ] && [ "$ENV" != "prod" ]; then
-  tput setaf 1; echo "Invalid environment specified. Use 'dev', 'stage', or 'prod'."; tput sgr0
+if [ "$ENV" != "dev" ] && [ "$ENV" != "prod" ]; then
+  tput setaf 1; echo "Invalid environment specified. Use 'dev' or 'prod'."; tput sgr0
   exit 1
 fi
 tput setaf 2; echo "Building kubernetes resources for $ENV environment."; tput sgr0
@@ -20,15 +20,10 @@ if [ "$ENV" == "dev" ]; then
   docker build -t cnad-notification:latest -f ../notification/Dockerfile.dev ../notification
   docker build -t cnad-auth:latest -f ../auth/Dockerfile.dev ../auth
   docker build -t cnad-backend:latest -f ../backend/Dockerfile.dev ../backend
-elif [ "$ENV" == "stage" ]; then
-  CONFIG_DIR=stage
   
-  docker build -t cnad-gateway:latest -f ../gateway/Dockerfile ../gateway
-  docker build -t cnad-notification:latest -f ../notification/Dockerfile ../notification
-  docker build -t cnad-auth:latest -f ../auth/Dockerfile ../auth
-  docker build -t cnad-backend:latest -f ../backend/Dockerfile ../backend
 elif [ "$ENV" == "prod" ]; then
-  CONFIG_DIR=prod
+  echo "Building for production is not supported in this script. Please build manually."
+  exit 1
 fi
 
 if [ ! "$ENV" == "prod" ] && [ ! -f "$CONFIG_DIR/secret/secrets.yaml" ]; then
