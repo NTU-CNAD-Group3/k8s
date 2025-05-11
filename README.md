@@ -64,7 +64,7 @@ After installing istioctl, please run the following command to install Istio in 
 istioctl install --set profile=minimal -y
 ```
 
-If your resource is limited, you can modify the default resource requests and limits in the Istio configuration. For example, you can set the CPU and memory requests and limits to 200m and 1Gi respectively. You can do this by modifying the `istio-operator.yaml` file in the `istio` folder.
+If your resource is limited, you can modify the default resource requests and limits in the Istio configuration.
 
 ```yaml
 resources:
