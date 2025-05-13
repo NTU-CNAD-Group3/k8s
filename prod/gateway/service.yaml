@@ -3,8 +3,6 @@ kind: Service
 metadata:
   name: gateway
   namespace: gateway
-  annotations:
-    cloud.google.com/neg: '{"exposed_ports": {"8000":{"name": "cnad-prod-neg"}}}'
 spec:
   type: ClusterIP
   selector:
