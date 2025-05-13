@@ -1,6 +1,6 @@
 # K8s
 
-This repository contains two environments for deploying the services: dev, and production (on GKE). Each environment has its own configuration files and setup instructions.
+This repository contains two environments for deploying the application: dev, and production (on GKE).
 
 ## Environments setup
 
@@ -17,7 +17,7 @@ This repository contains two environments for deploying the services: dev, and p
 
 2. Setup Secrets
 
-Before starting the dev environment, please make sure you have setup the correct secrets for the services. We provide a template for the secrets in the `dev/secret/secrets-template.yaml` file. FYI, the secrets should be encoded in base64 format. You can use the following command to encode the secrets: (Windows users can use `git bash` or `wsl` to run this command)
+Before starting the dev environment, please make sure you have setup the correct secrets for the services. We provide a template for the secrets in the `dev/secret/secrets-template.yaml` file. FYI, the secrets should be encoded in base64 format. You can use the following command to encode the secrets:
 
 ```bash
 echo -n 'your-secret' | base64
@@ -61,16 +61,16 @@ Before deploying the services, please make sure you have installed `istioctl` an
 After installing istioctl, please run the following command to install Istio in your cluster:
 
 ```bash
-istioctl install --set profile=minimal -y
+istioctl install -f ./prod/istio/init/istio-operator.yaml
 ```
 
-If your resource is limited, you can modify the default resource requests and limits in the Istio configuration.
+If your resource is limited, you can modify the default resource requests in the `istiod` deployment manually. For example, you can change the resource requests to the following:
 
 ```yaml
 resources:
   requests:
     cpu: 200m
-    memory: 1Gi
+    memory: 200Mi
 ```
 
 After installing Istio, you can verify the installation by running the following command:
@@ -89,3 +89,5 @@ kubectl label namespace <namespace> istio-injection=enabled --overwrite
 kubectl label namespace gateway istio-injection=enabled --overwrite
 kubectl rollout restart deployment -n gateway gateway
 ```
+
+Then, you can deploy all the services in the `prod/istio` folder, which includes observability tools like Grafana, Jaeger, Prometheus, and Kiali. This will also create the Network Endpoint Group (NEG) in GCP. However, if you also want to create the load balancer, you need to apply all the files under the `prod/istio/temp` folder.
