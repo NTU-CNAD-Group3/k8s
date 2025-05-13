@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: api-virtualservice
+  namespace: istio-system
+spec:
+  hosts:
+    - '*'
+  gateways:
+    - istio-ingressgateway
+  http:
+    - match:
+        - uri:
+            prefix: /api
+      route:
+        - destination:
+            host: gateway.gateway.svc.cluster.local
+            port:
+              number: 8000
