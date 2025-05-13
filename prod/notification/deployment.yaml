@@ -23,12 +23,12 @@ spec:
         - name: notification
           image: asia-east1-docker.pkg.dev/cnad-group3/cnad-prod-repo/notification:latest
           imagePullPolicy: Always
-          command: ["/bin/sh"]
+          command: ['/bin/sh']
           args:
-            - "-c"
+            - '-c'
             - |
-              export sender_email=$(cat /mnt/secrets-store/sender-email) && \
-              export sender_email_password=$(cat /mnt/secrets-store/sender-email-password) && \
+              export SENDER_EMAIL=$(cat /mnt/secrets-store/sender-email) && \
+              export SENDER_EMAIL_PASSWORD=$(cat /mnt/secrets-store/sender-email-password) && \
               npm run start --silent
           resources:
             limits:
@@ -58,9 +58,9 @@ spec:
             failureThreshold: 1
           env:
             - name: PORT
-              value: "8000"
+              value: '8000'
             - name: CLIENT_URL
-              value: "https://cnad.info"
+              value: 'https://cnad.info'
             - name: RABBITMQ_ENDPOINT
               value: amqp://admin:admin@rabbitmq.queue.svc.cluster.local:5672
           volumeMounts:
@@ -74,4 +74,3 @@ spec:
             readOnly: true
             volumeAttributes:
               secretProviderClass: notification-secret
-          
