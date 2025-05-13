@@ -1,6 +1,10 @@
-# K8s
+# Kubernetes
 
 This repository contains two environments for deploying the application: dev, and production (on GKE).
+
+## Kubernetes Overview
+
+![image](/docs/architecture.png)
 
 ## Environments setup
 
