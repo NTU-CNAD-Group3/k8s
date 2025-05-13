@@ -20,7 +20,7 @@ spec:
                 port: 15021
                 targetPort: 15021
               - name: http
-                port: 80
+                port: 8080
                 targetPort: 8080
           serviceAnnotations:
-            cloud.google.com/neg: '{"ingress": true, "exposed_ports":{"80":{}}}'
+            cloud.google.com/neg: '{"ingress": true, "exposed_ports":{"8080":{}}}'
