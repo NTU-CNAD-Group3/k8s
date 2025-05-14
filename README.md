@@ -4,7 +4,7 @@ This repository contains two environments for deploying the application: dev, an
 
 ## Kubernetes Overview
 
-![image](/docs/architecture-2.png)
+![image](/docs/architecture-3.png)
 
 ## Environments setup
 
