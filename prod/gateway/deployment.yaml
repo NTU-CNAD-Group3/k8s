@@ -65,6 +65,8 @@ spec:
               value: "https://cnad.info"
             - name: AUTH_BASE_URL
               value: "http://auth.auth.svc.cluster.local:8000"
+            - name: BACKEND_BASE_URL
+              value: "http://backend.backend.svc.cluster.local:8000"
             - name: REDIS_HOST
               value: "redis-0.redis.redis.svc.cluster.local"
             - name: REDIS_PASSWORD
